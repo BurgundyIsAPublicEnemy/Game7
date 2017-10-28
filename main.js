@@ -62,3 +62,5 @@ ipcMain.on('add-keyword', function(event, arg) {
   console.log('added kw ' + arg);
   event.sender.send('update-keyword', arg);
 });
+
+
