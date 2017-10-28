@@ -1,5 +1,11 @@
 const electron = require('electron')
 
+//Module to access local filesystem
+const fs = require('fs')
+
+// Module to make requests to news api
+const net = electron.net
+// Module to let main and renderer talk to one another
 const ipcMain = electron.ipcMain
 // Module to control application life.
 const app = electron.app
@@ -8,6 +14,12 @@ const BrowserWindow = electron.BrowserWindow
 
 const path = require('path')
 const url = require('url')
+
+const apiKey = fs.readFileSync('./api-key.txt').toString()
+let keywords = ['celtic', 'England'];
+let cache = new Array;
+
+console.log(apiKey);
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -36,11 +48,44 @@ function createWindow () {
   })
 }
 
+
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.on('ready', createWindow)
+app.on('ready', function() {
+	createWindow();
+	
+	
+	setTimeout(function() {
+		const request = net.request('https://newsapi.org/v1/articles?source=bbc-sport&sortBy=top&apiKey=' + apiKey);
+		let body = new String;
 
+		request.on('response', (response) => {
+			response.on('data', (chunk) => {
+				body += chunk;
+			});
+
+			response.on('end', () => {
+				let articles = JSON.parse(body)["articles"];
+				for (i = 0; i < articles.length; i++) {
+					for (j = 0; j < keywords.length; j++) {
+						if (articles[i].title.includes(keywords[j]) || articles[i].description.includes(keywords[j])) {
+							console.log(articles[i].title + ' has ' + keywords[j])
+							if (!cache.includes(articles[i])) {
+								ipcMain.send('new-alert', articles[i]);
+							}
+						}
+					}
+				}
+			});
+				
+		});
+		
+		request.end()
+	}, 1);
+	
+});
+		
 // Quit when all windows are closed.
 app.on('window-all-closed', function () {
   // On OS X it is common for applications and their menu bar
@@ -60,7 +105,7 @@ app.on('activate', function () {
 
 ipcMain.on('add-keyword', function(event, arg) {
   console.log('added kw ' + arg);
-  event.sender.send('update-keyword', arg);
+  keywords.push(arg);
+  event.sender.send('update-keyword', keywords);
 });
-
 

@@ -12,10 +12,21 @@ function ipcSubmitForm() {
 }
 
 ipcRenderer.on('update-keyword', function (event, arg) {
-	let li = document.createElement('li');
-	li.appendChild(document.createTextNode(arg));
-	keywordList.appendChild(li);
-	console.log(li.innerText);
+	keywordList.innerHTML = "";
+	
+	for (i=0; i < arg.length; i ++) {
+		let li = document.createElement('li');
+		li.appendChild(document.createTextNode(arg[i]));
+		keywordList.appendChild(li);
+	}
+
+});
+
+ipcRenderer.on('new-alert', function (event, arg) {
+	let myNotification = new Notification(arg.title, {
+	  body: arg.description
+	});
+
 
 });
 
