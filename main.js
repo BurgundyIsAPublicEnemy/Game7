@@ -16,12 +16,27 @@ const path = require('path');
 const url = require('url');
 
 const apiKey = fs.readFileSync('./api-key.txt').toString();
-let keywords = ['celtic', 'england'];
+let keywords = JSON.parse(fs.readFileSync('./keywords.json'));
 let cache = [];
+
+//So your keywords are the same the next time you reopen game7
+function updateKeywordFile() {
+    fs.writeFile(
+        './keywords.json',
+
+        JSON.stringify(keywords),
+
+        function (err) {
+            if (err) {
+                console.error(err);
+            }
+        }
+    );
+}
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
-let mainWindow
+let mainWindow;
 
 function createWindow () {
   // Create the browser window.
@@ -79,10 +94,10 @@ ipcMain.on('init', function (event, arg) {
 });
 
 //Add and remove keywords from the list of arguments
-
 ipcMain.on('add-keyword', function(event, arg) {
     if (!keywords.includes(arg)) {
         keywords.push(arg);
+        updateKeywordFile();
         event.sender.send('refresh-keyword-list', keywords);
     }
 });
@@ -90,6 +105,7 @@ ipcMain.on('add-keyword', function(event, arg) {
 ipcMain.on('remove-keyword', function(event, arg) {
     if (keywords.includes(arg)) {
         keywords.splice(keywords.indexOf(arg), 1);
+        updateKeywordFile();
         event.sender.send('refresh-keyword-list', keywords);
     }
 });
