@@ -1,13 +1,80 @@
 @font-face {
     font-family: Roboto;
-    src: url(/fonts/Roboto/Roboto-Regular.ttf);
+    src: url("./fonts/Roboto/Roboto-Regular.ttf");
 }
 
 @font-face {
-    font-family: Knewave;
-    src: url(/fonts/Knewave/Knewave-Regular.ttf);
+    font-family: Patua One;
+    src: url("./fonts/PatuaOne/PatuaOne-Regular.ttf");
 }
 
-h1 {
-    font-family: Knewave, sans-serif;
+#content {
+    padding-top: 90px;
 }
+
+#keyword-submit {
+    color: #000035;
+    border-radius: 3px;
+    border: 1px solid #000035;
+    background-color: #fafafa;
+}
+
+#keyword-remove {
+    color: #350004;
+    border-radius: 3px;
+    border: 1px solid #350004;
+    background-color: #ffffff;
+}
+
+#keyword-submit:hover {
+    color: #fafafa;
+    background-color: #000035;
+}
+
+#keyword-remove:hover {
+    color: #fafafa;
+    background-color: #350004;
+}
+
+body {
+    font-family: Roboto;
+    padding: 0;
+    background-color: #fafafa;
+}
+
+header {
+    position: fixed;
+    height: 90px;
+    width: 100%;
+}
+
+ul {
+    list-style: none inside;
+    margin:0;
+    padding:0;
+    padding-top: 6px; /* Display breaks if padding and padding-top are merged */
+
+}
+
+li {
+    padding: 3px;
+}
+
+li:nth-child(odd) { background: #e9e9e9; }
+
+h1 {
+    padding-bottom: 2px;
+    margin-top: 0;
+    margin-bottom: 20px;
+    border-bottom: #350004 5px solid;
+    font-family: Patua One;
+    color: #000035;
+    font-size: 60px;
+}
+
+label {
+    display: block;
+    padding-bottom: 8px;
+}
+
+

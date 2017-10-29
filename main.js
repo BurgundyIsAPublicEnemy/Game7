@@ -16,10 +16,8 @@ const path = require('path');
 const url = require('url');
 
 const apiKey = fs.readFileSync('./api-key.txt').toString();
-let keywords = ['celtic', 'England'];
+let keywords = ['celtic', 'england'];
 let cache = [];
-
-console.log(apiKey);
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -27,7 +25,10 @@ let mainWindow
 
 function createWindow () {
   // Create the browser window.
-  mainWindow = new BrowserWindow({width: 800, height: 600})
+  mainWindow = new BrowserWindow({width: 330, height: 600, icon: path.join(__dirname, '/icon/png/64x64.png')});
+
+  // hide the browser menu
+  mainWindow.setMenu(null);
 
   // and load the index.html of the app.
   mainWindow.loadURL(url.format({
@@ -36,8 +37,6 @@ function createWindow () {
     slashes: true
   }));
 
-  // Open the DevTools.
-  // mainWindow.webContents.openDevTools()
 
   // Emitted when the window is closed.
   mainWindow.on('closed', function () {
@@ -73,9 +72,13 @@ app.on('activate', function () {
   }
 });
 
+
+//Things that should be done once, as soon as the program is run
 ipcMain.on('init', function (event, arg) {
     event.sender.send('refresh-keyword-list', keywords);
 });
+
+//Add and remove keywords from the list of arguments
 
 ipcMain.on('add-keyword', function(event, arg) {
     if (!keywords.includes(arg)) {
@@ -91,6 +94,8 @@ ipcMain.on('remove-keyword', function(event, arg) {
     }
 });
 
+
+//Check News API.
 ipcMain.on('check-for-updates', function (event, arg) {
     const request = net.request('https://newsapi.org/v1/articles?source=bbc-sport&sortBy=top&apiKey=' + apiKey);
     let body = new String;
@@ -104,11 +109,10 @@ ipcMain.on('check-for-updates', function (event, arg) {
             let articles = JSON.parse(body)["articles"];
             for (i = 0; i < articles.length; i++) {
                 for (j = 0; j < keywords.length; j++) {
-                    if (articles[i].title.includes(keywords[j]) || articles[i].description.includes(keywords[j])) {
-                        if (!cache.includes(articles[i].title)) {
+                    if (articles[i].title.toLowerCase().includes(keywords[j]) || articles[i].description.toLowerCase().includes(keywords[j])) {
+                        if (!cache.includes(articles[i].url)) { // Verify that the user has not been alerted to this news already.
                             event.sender.send('news-alert', articles[i]);
-                            console.log('sent ' + articles[i].title);
-                            cache.push(articles[i].title);
+                            cache.push(articles[i].url);
                         }
                     }
                 }

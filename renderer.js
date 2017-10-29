@@ -11,12 +11,17 @@ const keywordSubmitButton = document.getElementById('keyword-submit');
 const keywordRemoveButton = document.getElementById('keyword-remove');
 const keywordList = document.getElementById('keyword-list');
 
+
+//Sends contents of keywordField to main.js, so that it can be used as a filter
 function ipcSubmitForm(channel) {
-	let keyword = keywordField.value;
-	ipcRenderer.send(channel, keyword);
-	console.log('Sent ' + keyword);
+	let keyword = keywordField.value.toLowerCase().trim();
+
+	if (keyword !== "") {
+        ipcRenderer.send(channel, keyword);
+    }
 }
 
+//Refreshes the visible list of keywords to match the one in main.js
 ipcRenderer.on('refresh-keyword-list', function (event, arg) {
 	keywordList.innerHTML = "";
 	
@@ -40,6 +45,7 @@ ipcRenderer.on('news-alert', function (event, arg) {
 });
 
 
+// Checks for updates every minute to see if there is more news
 setInterval(function () {
     ipcRenderer.send('check-for-updates');
 },60000);
